@@ -8,5 +8,12 @@ export default defineNuxtConfig({
     shim: false,
   },
   css: ["mdi/css/materialdesignicons.min.css"],
-  modules: ["@vueuse/nuxt"],
+  modules: ["@vueuse/nuxt", "@pinia/nuxt"],
+  imports: {
+    dirs: ["./stores"],
+  },
+  pinia: {
+    autoImports: ['defineStore', 'acceptHMRUpdate'],
+  },
+
 });
