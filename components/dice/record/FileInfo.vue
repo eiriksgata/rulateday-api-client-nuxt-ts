@@ -8,11 +8,11 @@
         label="选择记录文件"></v-file-input>
       <v-row>
         <v-col cols="6">
-          <v-switch :hide-details="false" dense v-model="switchButton.showSenderId" label="显示发送人ID"
+          <v-switch :hide-details="true" dense v-model="switchButton.showSenderId" label="显示发送人ID"
             color="indigo darken-3"></v-switch>
         </v-col>
         <v-col cols="6">
-          <v-switch :hide-details="false" dense v-model="switchButton.showDate" label="显示发送时间"
+          <v-switch :hide-details="true" dense v-model="switchButton.showDate" label="显示发送时间"
             color="indigo darken-3"></v-switch>
         </v-col>
 
@@ -41,7 +41,7 @@
             <div class="sender-list-item-box" :key="key" v-for="(value, key) in senderMap">
               <v-item v-slot="{ isSelected, toggle }">
                 <v-card elevation="5" :color="isSelected ? 'primary' : ''" @click="
-                                                                                                                                                                                                                  if (toggle) toggle();
+                                                                                                                                                                                                                                                                                                                                                                                  if (toggle) toggle();
                   selectChangePictureSender(value[0]);
                   ">
                   <v-img :src="senderPicture.get(value[0])"></v-img>
@@ -71,10 +71,13 @@
 </style>
 
 <script setup lang="ts">
-import prettier from 'prettier/standalone';
 import { ref, reactive } from 'vue';
-import { ChatRecordData, Records, contentStyleData } from './file-info.component.module'
+import { ChatRecordData, Records, ContentStyleData } from './FileInfo.component.module'
 import { toast } from 'vue3-toastify';
+import { useRecordOut } from '../../../stores/out-record-data';
+import * as prettier from "prettier";
+import parserBabel from 'prettier/plugins/babel';
+import parserprettierPluginEstree from 'prettier/plugins/estree';
 
 const selectFiles = ref(new Array<File>);
 const selectChangeSenderPictureFiles = ref(new Array<File>);
@@ -82,14 +85,12 @@ const selectChangeSenderPictureFiles = ref(new Array<File>);
 const senderMap = reactive(new Map());
 const senderPicture = reactive(new Map());
 
-let currentSelectChangePictureSenderId = ref(0);
-let contentStyleData = ref(new Array<contentStyleData>());
-let recordData = ref({} as ChatRecordData);
-let chatMessageRecordHandlerResult = ref('');
+const recordOut = useRecordOut();
 
-const textContext = reactive({
-  source: ''
-});
+let currentSelectChangePictureSenderId = ref(0);
+
+let recordData = ref({} as ChatRecordData);
+
 const recordInfo = reactive({
   recordSize: 0,
   senderSize: 0
@@ -113,19 +114,23 @@ const changeFile = (): void => {
 const getFormatSourceJsonText = (): void => {
   prettier.format(JSON.stringify(recordData.value), {
     parser: "json",
+    plugins: [
+      parserBabel,
+      parserprettierPluginEstree
+    ],
     endOfLine: 'auto'
   }).then((value: string) => {
-    textContext.source = value;
+    recordOut.textContextSource = value;
   });
 }
 
 const contentStyleFrameRecordTextHandler = (): void => {
-  contentStyleData.value.length = 0;
+  recordOut.contentStyleData.length = 0;
   recordData.value.records.map((value: Records, index: number) => {
-    contentStyleData.value.push({
-      avatar: senderPicture.get(value.senderId),
+    recordOut.contentStyleData.push({
+      prependAvatar: senderPicture.get(value.senderId),
       title: value.senderName,
-      content: value.content
+      subtitle: value.content
     });
   });
 }
@@ -164,7 +169,7 @@ const chatRecordTextViewHandler = (): void => {
   });
   recordInfo.recordSize = recordData.value.records.length;
   recordInfo.senderSize = senderMap.size;
-  chatMessageRecordHandlerResult.value = result;
+  recordOut.chatMessageRecordHandlerResult = result;
 }
 
 const selectChangePictureSender = (id: number): void => {
