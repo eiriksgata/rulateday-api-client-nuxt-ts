@@ -41,7 +41,7 @@
             <div class="sender-list-item-box" :key="key" v-for="(value, key) in senderMap">
               <v-item v-slot="{ isSelected, toggle }">
                 <v-card elevation="5" :color="isSelected ? 'primary' : ''" @click="
-                                                                                                                                                                                                                                                                                                                                                                                  if (toggle) toggle();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                  if (toggle) toggle();
                   selectChangePictureSender(value[0]);
                   ">
                   <v-img :src="senderPicture.get(value[0])"></v-img>
@@ -175,4 +175,8 @@ const chatRecordTextViewHandler = (): void => {
 const selectChangePictureSender = (id: number): void => {
   currentSelectChangePictureSenderId.value = id;
 }
+
+watch(switchButton, () => {
+  chatRecordTextViewHandler();
+})
 </script>

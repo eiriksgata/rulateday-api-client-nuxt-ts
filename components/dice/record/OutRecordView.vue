@@ -57,7 +57,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ContentStyleData } from './FileInfo.component.module'
 import { useRecordOut } from '../../../stores/out-record-data';
 
 
