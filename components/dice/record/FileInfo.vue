@@ -41,7 +41,7 @@
             <div class="sender-list-item-box" :key="key" v-for="(value, key) in senderMap">
               <v-item v-slot="{ isSelected, toggle }">
                 <v-card elevation="5" :color="isSelected ? 'primary' : ''" @click="
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  if (toggle) toggle();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  if (toggle) toggle();
                   selectChangePictureSender(value[0]);
                   ">
                   <v-img :src="senderPicture.get(value[0])"></v-img>
@@ -74,7 +74,6 @@
 import { ref, reactive } from 'vue';
 import { ChatRecordData, Records, ContentStyleData } from './FileInfo.component.module'
 import { toast } from 'vue3-toastify';
-import { useRecordOut } from '../../../stores/out-record-data';
 import * as prettier from "prettier";
 import parserBabel from 'prettier/plugins/babel';
 import parserprettierPluginEstree from 'prettier/plugins/estree';
@@ -84,8 +83,6 @@ const selectChangeSenderPictureFiles = ref(new Array<File>);
 
 const senderMap = reactive(new Map());
 const senderPicture = reactive(new Map());
-
-const recordOut = useRecordOut();
 
 let currentSelectChangePictureSenderId = ref(0);
 
@@ -120,19 +117,20 @@ const getFormatSourceJsonText = (): void => {
     ],
     endOfLine: 'auto'
   }).then((value: string) => {
-    recordOut.textContextSource = value;
+    emit('setTextContextSource', value);
   });
 }
 
 const contentStyleFrameRecordTextHandler = (): void => {
-  recordOut.contentStyleData.length = 0;
+  const result = new Array<ContentStyleData>();
   recordData.value.records.map((value: Records, index: number) => {
-    recordOut.contentStyleData.push({
+    result.push({
       prependAvatar: senderPicture.get(value.senderId),
       title: value.senderName,
       subtitle: value.content
     });
   });
+  emit('setContentStyleData', result);
 }
 
 const changeSenderPictureFile = (): void => {
@@ -169,7 +167,7 @@ const chatRecordTextViewHandler = (): void => {
   });
   recordInfo.recordSize = recordData.value.records.length;
   recordInfo.senderSize = senderMap.size;
-  recordOut.chatMessageRecordHandlerResult = result;
+  emit('setChatMessageRecordHandlerResult', result);
 }
 
 const selectChangePictureSender = (id: number): void => {
@@ -179,4 +177,12 @@ const selectChangePictureSender = (id: number): void => {
 watch(switchButton, () => {
   chatRecordTextViewHandler();
 })
+
+const emit = defineEmits<{
+  setTextContextSource: [param: string]
+  setContentStyleData: [param: Array<ContentStyleData>]
+  setChatMessageRecordHandlerResult: [param: string]
+}>();
+
+
 </script>

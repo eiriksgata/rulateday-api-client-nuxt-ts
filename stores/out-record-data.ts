@@ -1,10 +1,14 @@
 import { defineStore } from "pinia";
 import { ContentStyleData } from "../components/dice/record/FileInfo.component.module";
 
-export const useRecordOut = defineStore("recordOut", {
-  state: () => ({
-    textContextSource: ref(""),
-    contentStyleData: ref(new Array<ContentStyleData>()),
-    chatMessageRecordHandlerResult: ref(""),
-  }),
+export const useRecordOut = defineStore("recordOut", () => {
+  const textContextSource = ref("");
+  const contentStyleData = ref(new Array<ContentStyleData>());
+  const chatMessageRecordHandlerResult = ref("");
+
+  return {
+    textContextSource,
+    contentStyleData,
+    chatMessageRecordHandlerResult,
+  };
 });
