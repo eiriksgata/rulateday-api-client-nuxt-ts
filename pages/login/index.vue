@@ -13,23 +13,27 @@
           <v-text-field v-model="form.password" :counter="20" :rules="passwordRules" label="Password" required
             type="password" :disabled="loading" @keydown.enter="validate()"></v-text-field>
 
-          <v-img @click="getCaptcha" title="点击刷新验证码" :width="200" :height="50" cover :src="captchaImage"></v-img>
+          <v-card :loading="loading">
+            <v-img lazy-src="/images/material.jpg" @click="getCaptcha" title="点击刷新验证码" :max-height="50"
+              :disabled="loading" :src="captchaImage" class="bg-grey-lighten-2">
+              <template v-slot:placeholder>
+                <div class="d-flex align-center justify-center fill-height">
+                  <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
+                </div>
+              </template>
+            </v-img>
+          </v-card>
 
-          <v-text-field v-model="form.captcha" :counter="20" :rules="usernameRules" label="Captcha" :disabled="loading"
+          <v-text-field v-model="form.captcha" :counter="20" :rules="captchaRule" label="Captcha" :disabled="loading"
             required></v-text-field>
 
           <v-btn :disabled="!valid" color="success" class="mr-4 mt-4" @click="validate">
             提交
           </v-btn>
-
-
-          <v-btn color="error" class="mr-4 mt-4" @click="reset"> 重置表单 </v-btn>
-
+          <v-btn :disabled="loading" color="error" class="mr-4 mt-4" @click="reset"> 重置表单 </v-btn>
         </v-form>
       </v-card-text>
     </v-card>
-
-
   </div>
 </template>
 
@@ -72,7 +76,7 @@ const cryptoKey = hex.parse('12223455125435063425124204575516');
 const cryptoIv = hex.parse('05210352473562157534214512563228');
 
 
-const captchaImage = ref("https://cdn.vuetifyjs.com/images/parallax/material.jpg");
+const captchaImage = ref('/images/material.jpg');
 
 
 const form = reactive({
@@ -90,6 +94,11 @@ const passwordRules = [
   (v: any) => !!v || 'Password is required',
   (v: any) => (v && v.length <= 20) || 'Name must be less than 10 characters'
 ]
+
+const captchaRule = [
+  (v: any) => !!v || 'captcha is required',
+  (v: any) => (v && v.length <= 20) || 'Name must be less than 10 characters',
+];
 
 const validate = () => {
 
@@ -139,8 +148,8 @@ const validate = () => {
   }
 }
 
-function getCaptcha() {
-  if (form.username == null || form.username == '' || form.username === undefined) {
+const getCaptcha = () => {
+  if (form.username == null || form.username == '' || form.username === undefined || loading.value) {
     return;
   }
   const option: UseFetchOptions<ServerResponse<captchaVo>> = {
@@ -169,9 +178,12 @@ function getCaptcha() {
 
 }
 
-function reset() {
+const reset = () => {
   loginForm.value.reset();
 }
+
+
+
 
 
 
