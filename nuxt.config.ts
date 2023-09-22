@@ -4,6 +4,18 @@ export default defineNuxtConfig({
     transpile: ["vuetify"],
   },
   devtools: { enabled: true },
+  nitro: {
+    routeRules: {
+      "/server/**": {
+        static: false,
+        cors: true,
+        proxy: "http://localhost:16467/**",
+      },
+    },
+  },
+
+  // 该配置用于服务端请求转发
+
   typescript: {
     shim: false,
   },

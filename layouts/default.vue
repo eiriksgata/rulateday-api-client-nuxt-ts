@@ -9,7 +9,7 @@
         工具主页
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn color="info">登陆</v-btn>
+      <v-btn variant="outlined" color="info">登陆</v-btn>
     </v-app-bar>
     <v-main style="background-color: #bbe6d6">
 
