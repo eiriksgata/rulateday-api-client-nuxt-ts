@@ -1,8 +1,7 @@
 <template>
-  <VCard>
-    <v-card-title primary-title>
-      新闻
-    </v-card-title>
-  </VCard>
+  <v-card>
 
+  </v-card>
 </template>
+
+<style></style>

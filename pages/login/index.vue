@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <v-card :loading="loading" class="mx-auto my-12" max-width="374">
+    <v-card :loading="loading" class="mx-auto my-12" width="375">
       <template slot="progress">
         <v-progress-linear color="deep-purple" height="10" indeterminate></v-progress-linear>
       </template>
@@ -8,12 +8,12 @@
       <v-card-text>
         <v-form ref="loginForm" v-model="valid" lazy-validation>
           <v-text-field v-model="form.username" :counter="20" :rules="usernameRules" label="Username" :disabled="loading"
-            @blur="getCaptcha" required></v-text-field>
+            required></v-text-field>
 
           <v-text-field v-model="form.password" :counter="20" :rules="passwordRules" label="Password" required
             type="password" :disabled="loading" @keydown.enter="validate()"></v-text-field>
 
-          <v-card :loading="loading">
+          <!-- <v-card :loading="loading">
             <v-img lazy-src="/images/material.jpg" @click="getCaptcha" title="点击刷新验证码" :max-height="50"
               :disabled="loading" :src="captchaImage" class="bg-grey-lighten-2">
               <template v-slot:placeholder>
@@ -22,11 +22,19 @@
                 </div>
               </template>
             </v-img>
-          </v-card>
+          </v-card> -->
 
-          <v-text-field v-model="form.captcha" :counter="20" :rules="captchaRule" label="Captcha" :disabled="loading"
-            required></v-text-field>
+          <v-input :error-messages="getSliderCaptchaBtnErrMsg" v-show="!sliderCaptchaBoxShow" required>
+            <v-btn theme="dark" @click="getSliderCaptcha" block>进行滑块认证</v-btn>
+          </v-input>
 
+          <div v-show="sliderCaptchaBoxShow">
+            <verify-slider-captcha ref="sliderCaptcha" :username="form.username"
+              @verify-callback="sliderVerifyEventCallback"></verify-slider-captcha>
+          </div>
+          <v-radio-group v-show="sliderCaptchaBoxShow" required :rules="captchaRule" v-model="sliderCaptchaState">
+            <v-radio label="滑块验证通过状态" value="1" color="success" :readonly="true"></v-radio>
+          </v-radio-group>
           <v-btn :disabled="!valid" color="success" class="mr-4 mt-4" @click="validate">
             提交
           </v-btn>
@@ -63,26 +71,25 @@ type AccessTokenVo = {
   expirationTime: Date
 }
 
-type captchaVo = {
-  codeId: string,
-  pictureBase64: string
-}
 
 const loading = ref(false);
 const valid = ref(false);
 
-const loginForm = ref(null) as any;
+const sliderCaptchaBoxShow = ref(false);
+const sliderCaptchaState = ref('');
+
+const loginForm = ref();
 const cryptoKey = hex.parse('12223455125435063425124204575516');
 const cryptoIv = hex.parse('05210352473562157534214512563228');
 
+const sliderCaptcha = ref();
 
-const captchaImage = ref('/images/material.jpg');
-
+const getSliderCaptchaBtnErrMsg = ref('');
 
 const form = reactive({
   username: '',
   password: '',
-  captcha: ''
+  captcha: 0
 });
 
 const usernameRules = [
@@ -97,8 +104,17 @@ const passwordRules = [
 
 const captchaRule = [
   (v: any) => !!v || 'captcha is required',
-  (v: any) => (v && v.length <= 20) || 'Name must be less than 10 characters',
 ];
+
+const getSliderCaptcha = () => {
+  if (form.username == '') {
+    getSliderCaptchaBtnErrMsg.value = 'username is null';
+    return;
+  }
+  sliderCaptcha.value.getCaptcha();
+  sliderCaptchaBoxShow.value = true;
+  getSliderCaptchaBtnErrMsg.value = '';
+}
 
 const validate = () => {
 
@@ -114,7 +130,9 @@ const validate = () => {
     const cryptoJson = {
       username: form.username,
       password: bcHash,
-      captcha: form.captcha,
+      data: {
+        offset: form.captcha
+      },
       timestamp: Date.parse(new Date().toString())
     }
 
@@ -128,67 +146,33 @@ const validate = () => {
     }
 
     valid.value = false;
-    useFetch('/server/api/v1/authentication', option).then(({ data: response }) => {
+    useFetch('/server/api/v1/authentication/captcha/slider', option).then(({ data: response }) => {
       if (response.value?.code == 0) {
-        toast.success(response.value!.message)
+        toast.success(response.value!.message);
         localStorage.setItem("token", response.value!.data.token);
+        setTimeout(function () {
+          navigateTo({ path: '/dashboard' });
+        }, 2000);
 
       } else {
         toast.error(response.value!.message);
         loading.value = false;
         valid.value = true;
-        getCaptcha();
       }
 
     }).catch((error) => {
       toast.error(error);
     });
-
-
   }
 }
 
-const getCaptcha = () => {
-  if (form.username == null || form.username == '' || form.username === undefined || loading.value) {
-    return;
-  }
-  const option: UseFetchOptions<ServerResponse<captchaVo>> = {
-    method: "get",
-    server: true
-  }
-
-  useFetch(`/server/api/v1/generate/captcha/${form.username}`, option).then(({ data: response }) => {
-    if (response.value?.code == 0) {
-
-      const picture = "data:image/png;base64," + response.value.data.pictureBase64;
-
-      captchaImage.value = picture;
-
-
-    } else {
-      toast.error(response.value!.message);
-      loading.value = false;
-      valid.value = true;
-    }
-
-  }).catch((error) => {
-    toast.error(error);
-  });
-
-
+const sliderVerifyEventCallback = (result: number) => {
+  sliderCaptchaState.value = "1";
+  form.captcha = result;
 }
 
 const reset = () => {
   loginForm.value.reset();
 }
-
-
-
-
-
-
-
-
-
 
 </script>

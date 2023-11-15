@@ -7,10 +7,20 @@
     </v-list-item>
 
     <v-divider></v-divider>
-    <v-list>
-      <v-list-item prepend-icon="mdi-home-city" title="Home" value="home"></v-list-item>
-      <v-list-item prepend-icon="mdi-account" title="My Account" value="account"></v-list-item>
-      <v-list-item prepend-icon="mdi-account-group-outline" title="Users" value="users"></v-list-item>
+    <v-list v-model="navigationOpen">
+      <v-list-item prepend-icon="mdi-home" title="Home" value="home"></v-list-item>
+      <v-list-group value="RBAC">
+        <template v-slot:activator="{ props }">
+          <v-list-item v-bind="props" prepend-icon="mdi-account-circle" title="RBAC">
+          </v-list-item>
+        </template>
+        <v-list-item title="Role" value="role" @click="$router.push('/dashboard/role')"></v-list-item>
+        <v-list-item title="Permission" value="permission"></v-list-item>
+        <v-list-item title="User" value="user"></v-list-item>
+
+
+
+      </v-list-group>
     </v-list>
   </v-navigation-drawer>
 
@@ -25,6 +35,8 @@
 
 const rail = ref(true)
 const dashboardDrawer = ref(true);
+
+const navigationOpen = ref('home');
 
 
 </script>
