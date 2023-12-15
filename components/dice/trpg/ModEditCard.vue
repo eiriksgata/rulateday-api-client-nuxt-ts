@@ -300,7 +300,7 @@
 import { ref, reactive, toRef } from 'vue';
 import { toast } from 'vue3-toastify';
 import { removeArrayItemByValue } from "@/utils/HexTool";
-import { TrpgMod, TrpgModOption, TrpgModImportDataRole, TrpgModEventNode } from './TrpgMod.component.module';
+import type { TrpgMod, TrpgModOption, TrpgModImportDataRole, TrpgModEventNode } from './TrpgMod.component.module';
 
 const trpgModelFile = ref([]);
 const trpgModelData: TrpgMod = reactive({

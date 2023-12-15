@@ -44,7 +44,7 @@
 </style>
 
 <script lang="ts" setup>
-import { UseFetchOptions } from 'nuxt/app';
+import type { UseFetchOptions } from 'nuxt/app';
 import { toast } from 'vue3-toastify';
 
 

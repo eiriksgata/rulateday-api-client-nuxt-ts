@@ -1,6 +1,6 @@
 
 <template>
-  <v-card>
+  <v-card elevation="3">
     <v-tabs v-model="tabsTextFrameDataName">
       <v-tab value="textTab">Text</v-tab>
       <v-tab value="contentTab">Content风格</v-tab>

@@ -2,7 +2,7 @@
   <v-row dense>
 
     <v-col cols="12" md="4" sm="4" xl="3">
-      <v-card prepend-icon="mdi-message-bulleted" @click="$router.push('/tools/dice/record')">
+      <v-card hover prepend-icon="mdi-message-bulleted" @click="$router.push('/tools/dice/record')">
         <template v-slot:title>
           聊天记录处理工具
         </template>
@@ -15,7 +15,7 @@
 
 
     <v-col cols="12" md="4" sm="4" xl="3">
-      <v-card prepend-icon="mdi-cards-playing-diamond-multiple-outline" @click="$router.push('/tools/dice/record')">
+      <v-card hover prepend-icon="mdi-cards-playing-diamond-multiple-outline" @click="$router.push('/tools/dice/record')">
         <template v-slot:title>
           FF14九宫幻卡对局分析器
         </template>
@@ -26,7 +26,7 @@
     </v-col>
 
     <v-col cols="12" md="4" sm="4" xl="3">
-      <v-card prepend-icon="mdi-view-dashboard-edit" @click="$router.push('/tools/dice/trpg')">
+      <v-card hover prepend-icon="mdi-view-dashboard-edit" @click="$router.push('/tools/dice/trpg')">
         <template v-slot:title>
           TRPG模组编辑器
         </template>

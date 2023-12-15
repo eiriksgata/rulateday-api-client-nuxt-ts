@@ -61,3 +61,20 @@ type SchemeNodeTreeStruct = {
   offensive: SchemeNode;
   defensive: SchemeNode;
 };
+
+type Role = {
+  id?: number;
+  name: string;
+  intro: string;
+  code: string;
+  permissions?: Array<Permission>;
+};
+
+type Permission = {
+  id :number
+  parentId: number
+  name : string
+  alias : string
+  action : string
+  children : any
+}

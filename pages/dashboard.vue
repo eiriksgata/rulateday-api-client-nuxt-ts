@@ -1,42 +1,121 @@
 <template>
-  <v-navigation-drawer v-model="dashboardDrawer" elevation="0" :rail="rail" permanent @click="rail = false">
-    <v-list-item title="管理员后台" nav>
-      <template v-slot:append>
-        <v-btn variant="text" :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'" @click.stop="rail = !rail"></v-btn>
-      </template>
-    </v-list-item>
-
-    <v-divider></v-divider>
-    <v-list v-model="navigationOpen">
-      <v-list-item prepend-icon="mdi-home" title="Home" value="home"></v-list-item>
-      <v-list-group value="RBAC">
-        <template v-slot:activator="{ props }">
-          <v-list-item v-bind="props" prepend-icon="mdi-account-circle" title="RBAC">
-          </v-list-item>
+  <v-layout>
+    <v-navigation-drawer v-model="dashboardDrawer" :rail="rail" permanent @click="rail = false">
+      <v-list-item title="管理员后台" nav>
+        <template v-slot:append>
+          <v-btn variant="text" :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'"
+            @click.stop="rail = !rail"></v-btn>
         </template>
-        <v-list-item title="Role" value="role" @click="$router.push('/dashboard/role')"></v-list-item>
-        <v-list-item title="Permission" value="permission"></v-list-item>
-        <v-list-item title="User" value="user"></v-list-item>
+      </v-list-item>
 
+      <v-divider></v-divider>
+      <v-list density="compact" nav>
+        <v-list-item prepend-icon="mdi-home" title="Home" value="home"></v-list-item>
+        <v-list-group value="RBAC">
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" prepend-icon="mdi-account-circle" title="RBAC">
+            </v-list-item>
+          </template>
+          <v-list-item title="Role" value="role" @click="$router.push('/dashboard/rbac/role')"></v-list-item>
+          <v-list-item title="Permission" value="permission"></v-list-item>
+          <v-list-item title="User" value="user"></v-list-item>
 
+        </v-list-group>
+      </v-list>
+    </v-navigation-drawer>
 
-      </v-list-group>
-    </v-list>
-  </v-navigation-drawer>
+    <!-- <v-navigation-drawer v-model="drawer" temporary location="right">
+      <v-list-item prepend-avatar="/images/person-null.jpg" :title="accountInfo.sub"></v-list-item>
+      <v-divider></v-divider>
+      <v-list density="compact" nav>
+        <v-list-item prepend-icon="mdi-newspaper-variant-outline" title="新闻" value="news"></v-list-item>
 
-  <div>
-    <NuxtPage />
-  </div>
+        <v-list-item prepend-icon="mdi-account-circle-outline" title="个人信息" value="userInfo"></v-list-item>
+
+        <v-list-item prepend-icon="mdi-shield-account-outline" title="账号设置" value="account"></v-list-item>
+
+        <v-list-item prepend-icon="mdi-message-alert-outline" title="消息" value="message"></v-list-item>
+      </v-list>
+
+      <v-divider></v-divider>
+      <v-list-item link prepend-icon="mdi-logout" title="Logout" value="logout"></v-list-item>
+    </v-navigation-drawer> -->
+
+    <v-app-bar prominent elevation="1">
+      <v-btn prepend-icon="mdi-home" style="margin-left: 50px;" @click="$router.push('/')">
+        <template v-slot:prepend>
+          <v-icon color=""></v-icon>
+        </template>
+        工具主页
+      </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn class="mr-2" v-if="adminBtn" variant="outlined" color="waring"
+        @click="$router.push('/dashboard/home')">管理员后台</v-btn>
+
+      <v-btn class="mr-2" v-if="accountInfo.sub === ''" variant="outlined" color="info">登陆</v-btn>
+
+      <v-btn class="mr-2" @Click="clickUserInfo" v-if="accountInfo.sub !== ''" variant="outlined" color="info"
+        prepend-icon="mdi-account-circle"><template v-slot:prepend>
+          <v-icon color="info"></v-icon>
+        </template>{{ accountInfo.sub }}</v-btn>
+
+    </v-app-bar>
+
+    <v-main>
+      <NuxtPage />
+    </v-main>
+
+  </v-layout>
+
 </template>
 
 <style scoped></style>
 
 <script lang="ts" setup>
 
-const rail = ref(true)
+const rail = ref(false)
 const dashboardDrawer = ref(true);
 
 const navigationOpen = ref('home');
+
+type TokenPayload = {
+  exp: number
+  iat: number
+  iss: string
+  sub: string
+  roles: Array<string>
+}
+
+const accountInfo = ref({
+  exp: -1,
+  iat: -1,
+  iss: '',
+  sub: '',
+  roles: new Array<string>()
+} as TokenPayload);
+
+const drawer = ref(false);
+const adminBtn = ref(false);
+
+function clickUserInfo() {
+  if (drawer.value) {
+    drawer.value = false;
+  } else {
+    drawer.value = true;
+  }
+}
+onMounted(() => {
+  const jwt = localStorage.getItem('token');
+  if (jwt == null || jwt == undefined) {
+    return;
+  }
+  const base64Json = localStorage.getItem('token')!.split('.')[1];
+  const decodeJson = decodeURI((atob(base64Json)));
+  accountInfo.value = JSON.parse(decodeJson);
+  if (accountInfo.value.roles.includes('ADMIN')) {
+    adminBtn.value = true;
+  }
+});
 
 
 </script>

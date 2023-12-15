@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card elevation="3">
     <v-card-title>
       文件信息
     </v-card-title>
@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { ChatRecordData, Records, ContentStyleData } from './FileInfo.component.module'
+import type { ChatRecordData, Records, ContentStyleData } from './FileInfo.component.module'
 import { toast } from 'vue3-toastify';
 import * as prettier from "prettier";
 import parserBabel from 'prettier/plugins/babel';

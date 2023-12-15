@@ -1,19 +1,17 @@
 <template>
   <div class="login">
-    <v-card :loading="loading" class="mx-auto my-12" width="375">
-      <template slot="progress">
-        <v-progress-linear color="deep-purple" height="10" indeterminate></v-progress-linear>
-      </template>
-      <v-card-title>Backstage - Login </v-card-title>
-      <v-card-text>
-        <v-form ref="loginForm" v-model="valid" lazy-validation>
-          <v-text-field v-model="form.username" :counter="20" :rules="usernameRules" label="Username" :disabled="loading"
-            required></v-text-field>
+    <div class="d-flex justify-center">
+      <v-card style="margin-top: 50px;" :loading="loading" width="375">
+        <v-card-title>Backstage - Login </v-card-title>
+        <v-card-text>
+          <v-form ref="loginForm" v-model="valid" lazy-validation>
+            <v-text-field v-model="form.username" :counter="20" :rules="usernameRules" label="Username"
+              :disabled="loading" required></v-text-field>
 
-          <v-text-field v-model="form.password" :counter="20" :rules="passwordRules" label="Password" required
-            type="password" :disabled="loading" @keydown.enter="validate()"></v-text-field>
+            <v-text-field v-model="form.password" :counter="20" :rules="passwordRules" label="Password" required
+              type="password" :disabled="loading" @keydown.enter="validate()"></v-text-field>
 
-          <!-- <v-card :loading="loading">
+            <!-- <v-card :loading="loading">
             <v-img lazy-src="/images/material.jpg" @click="getCaptcha" title="点击刷新验证码" :max-height="50"
               :disabled="loading" :src="captchaImage" class="bg-grey-lighten-2">
               <template v-slot:placeholder>
@@ -24,46 +22,44 @@
             </v-img>
           </v-card> -->
 
-          <v-input :error-messages="getSliderCaptchaBtnErrMsg" v-show="!sliderCaptchaBoxShow" required>
-            <v-btn theme="dark" @click="getSliderCaptcha" block>进行滑块认证</v-btn>
-          </v-input>
+            <v-input :error-messages="getSliderCaptchaBtnErrMsg" v-show="!sliderCaptchaBoxShow" required>
+              <v-btn theme="dark" @click="getSliderCaptcha" block>进行滑块认证</v-btn>
+            </v-input>
 
-          <div v-show="sliderCaptchaBoxShow">
-            <verify-slider-captcha ref="sliderCaptcha" :username="form.username"
-              @verify-callback="sliderVerifyEventCallback"></verify-slider-captcha>
-          </div>
-          <v-radio-group v-show="sliderCaptchaBoxShow" required :rules="captchaRule" v-model="sliderCaptchaState">
-            <v-radio label="滑块验证通过状态" value="1" color="success" :readonly="true"></v-radio>
-          </v-radio-group>
-          <v-btn :disabled="!valid" color="success" class="mr-4 mt-4" @click="validate">
-            提交
-          </v-btn>
-          <v-btn :disabled="loading" color="error" class="mr-4 mt-4" @click="reset"> 重置表单 </v-btn>
-        </v-form>
-      </v-card-text>
-    </v-card>
+            <div v-show="sliderCaptchaBoxShow">
+              <verify-slider-captcha ref="sliderCaptcha" :username="form.username"
+                @verify-callback="sliderVerifyEventCallback"></verify-slider-captcha>
+            </div>
+            <v-radio-group v-show="sliderCaptchaBoxShow" required :rules="captchaRule" v-model="sliderCaptchaState">
+              <v-radio label="滑块验证通过状态" value="1" color="success" :readonly="true"></v-radio>
+            </v-radio-group>
+            <v-btn :disabled="!valid" color="success" class="mr-4 mt-4" @click="validate">
+              提交
+            </v-btn>
+            <v-btn :disabled="loading" color="error" class="mr-4 mt-4" @click="reset"> 重置表单 </v-btn>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </div>
+
+
+
+
   </div>
 </template>
 
-<style>
-.tools-base-btn-style {
-  margin-left: 10px;
-}
-
-html {
-  overflow-y: auto;
+<style scoped>
+.login {
+  background-image: url('/images/material.jpg');
+  height: 100vh;
 }
 </style>
 
 <script setup lang="ts">
-import aes from 'crypto-js/aes';
 import CryptoJS from 'crypto-js';
-
 import { genSaltSync, hashSync } from 'bcrypt-ts'
-
-import hex from 'crypto-js/enc-hex';
-import { UseFetchOptions } from 'nuxt/app';
 import { toast } from 'vue3-toastify';
+import type { UseFetchOptions } from 'nuxt/app';
 
 type AccessTokenVo = {
   loginAccount: string,
@@ -79,8 +75,8 @@ const sliderCaptchaBoxShow = ref(false);
 const sliderCaptchaState = ref('');
 
 const loginForm = ref();
-const cryptoKey = hex.parse('12223455125435063425124204575516');
-const cryptoIv = hex.parse('05210352473562157534214512563228');
+const cryptoKey = CryptoJS.enc.Hex.parse('12223455125435063425124204575516');
+const cryptoIv = CryptoJS.enc.Hex.parse('05210352473562157534214512563228');
 
 const sliderCaptcha = ref();
 
@@ -122,7 +118,7 @@ const validate = () => {
     //通过验证后提交数据
     loading.value = true;
 
-    const passwordSha256 = CryptoJS.SHA256(form.username + "&" + form.password).toString(hex);
+    const passwordSha256 = CryptoJS.SHA256(form.username + "&" + form.password).toString(CryptoJS.enc.Hex);
 
     const salt = genSaltSync(10);
     const bcHash = hashSync(passwordSha256, salt);
@@ -136,7 +132,7 @@ const validate = () => {
       timestamp: Date.parse(new Date().toString())
     }
 
-    const ciphertext = aes.encrypt(JSON.stringify(cryptoJson), cryptoKey, { iv: cryptoIv });
+    const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(cryptoJson), cryptoKey, { iv: cryptoIv });
     const option: UseFetchOptions<ServerResponse<AccessTokenVo>> = {
       method: "put",
       headers: {
@@ -174,5 +170,8 @@ const sliderVerifyEventCallback = (result: number) => {
 const reset = () => {
   loginForm.value.reset();
 }
+
+
+
 
 </script>

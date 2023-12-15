@@ -1,11 +1,11 @@
-export type Records = {
+type Records = {
   content: string;
   date: string;
   senderId: number;
   senderName: string;
 };
 
-export type ChatRecordData = {
+type ChatRecordData = {
   createdAt: string;
   createdById: number;
   groupId: number;
@@ -13,8 +13,10 @@ export type ChatRecordData = {
   records: Array<Records>;
 };
 
-export type ContentStyleData = {
+type ContentStyleData = {
   prependAvatar: string;
   title: string;
   subtitle: string;
 };
+
+export type { Records , ChatRecordData , ContentStyleData }
