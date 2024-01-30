@@ -2,13 +2,13 @@
   <v-data-table :headers="headers" :items="desserts" :sort-by="[{ key: 'calories', order: 'asc' }]">
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>用户管理</v-toolbar-title>
+        <v-toolbar-title>机器人管理</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ props }">
             <v-btn color="primary" variant="flat" rounded="2" class="mb-2" v-bind="props">
-              新建用户
+              新建机器人
             </v-btn>
           </template>
           <v-card>
@@ -19,34 +19,14 @@
             <v-card-text>
               <v-container>
                 <v-row>
+
                   <v-col cols="12" sm="12" md="12">
-                    <v-text-field :disabled="editedItem.id !== -1" v-model="editedItem.name" label="用户名"
-                      variant="solo-filled"></v-text-field>
+                    <v-text-field :disabled="editedItem.id !== -1" v-model="editedItem.machineCode" label="机器码（QQ号）" variant="solo-filled"></v-text-field>
                   </v-col>
 
-                  <v-col cols="12" sm="12" md="12" v-show="editedItem.id == -1">
-                    <v-text-field type="password" v-model="editedItem.pwd" label="密码"
-                      variant="solo-filled"></v-text-field>
+                  <v-col cols="12" sm="12" md="12">
+                    <v-text-field v-model="editedItem.description" label="描述" variant="solo-filled"></v-text-field>
                   </v-col>
-
-                  <v-col cols="6" sm="6" md="6">
-                    <v-switch color="primary" v-model="editedItem.isExpired" label="账号过期"></v-switch>
-                  </v-col>
-
-                  <v-col cols="6" sm="6" md="6">
-                    <v-switch color="primary" v-model="editedItem.isLocked" label="账号冻结"></v-switch>
-
-                  </v-col>
-
-                  <v-col cols="6" sm="6" md="6">
-                    <v-switch color="primary" v-model="editedItem.isPasswdExpired" label="密码过期"></v-switch>
-                  </v-col>
-
-                  <v-col cols="6" sm="6" md="6">
-                    <v-select multiple chips v-model="editedItem.roles" label="角色" :items="roleItems" item-title="name"
-                      item-value="id" variant="solo-filled"></v-select>
-                  </v-col>
-
 
                 </v-row>
               </v-container>
@@ -85,17 +65,10 @@
       </v-icon>
     </template>
 
-    <template v-slot:item.type="{ item }">
-      {{ accessTypeText(item.type) }}
+    <template v-slot:item.expirationAt="{ item }">
+      {{ Moment(item.expirationAt).format("YYYY-MM-DD HH:mm:ss") }}
     </template>
 
-    <template v-slot:item.createdAt="{ item }">
-      {{ Moment(item.createdAt).format("YYYY-MM-DD HH:mm:ss") }}
-    </template>
-
-    <template v-slot:item.updatedAt="{ item }">
-      {{ Moment(item.updatedAt).format("YYYY-MM-DD HH:mm:ss") }}
-    </template>
 
     <template v-slot:no-data>
       <v-btn color="primary" @click="initialize">
@@ -109,11 +82,8 @@
 <style scoped></style>
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue'
-import { getUsers, userSave, userDelete, userUpdate } from '~/server/api/user';
 import Moment from 'moment';
-import { getRoles } from '~/server/api/role';
-import CryptoJS from 'crypto-js';
-
+import { getRobotList, robotDelete, robotSave } from '~/server/api/robot';
 
 const dialog = ref(false)
 const dialogDelete = ref(false)
@@ -123,38 +93,32 @@ const headers = ref<any>([
     align: 'start',
     key: 'id'
   },
-  { title: '账号', key: 'name' },
-  { title: '账号类型', key: 'type' },
-  { title: '账号过期', key: 'isExpired' },
-  { title: '账号冻结', key: 'isLocked' },
-  { title: '密码过期', key: 'isPasswdExpired' },
-  { title: '创建时间', key: 'createdAt' },
-  { title: '更新时间', key: 'updatedAt' },
+  { title: 'token', key: 'name' },
+  { title: '描述', key: 'description' },
+  { title: '机器码（QQ号）', key: 'machineCode' },
+  { title: '过期时间', key: 'expirationAt' },
   { title: 'Actions', key: 'actions', sortable: false },
 ])
 
-const desserts = ref<Array<User>>([]);
+const desserts = ref<Array<Robot>>([]);
 
-const roleItems = ref<Array<Role>>();
 
-const editedItem = ref<User>({
+const editedItem = ref<Robot>({
   id: -1,
   name: '',
-  type: 2,
-  isExpired: false,
-  isLocked: false,
-  isPasswdExpired: false,
+  description: '',
+  machineCode: '',
+  expirationAt: new Date(),
   createdAt: new Date(),
   updatedAt: new Date()
 })
 
-const defaultItem = ref<User>({
+const defaultItem = ref<Robot>({
   id: -1,
   name: '',
-  type: 1,
-  isExpired: false,
-  isLocked: false,
-  isPasswdExpired: false,
+  description: '',
+  machineCode: '',
+  expirationAt: new Date(),
   createdAt: new Date(),
   updatedAt: new Date()
 });
@@ -164,22 +128,22 @@ const formTitle = computed(() => {
 })
 
 async function initialize() {
-  const result: ServerResponse<Array<User>> = await getUsers();
+  const result: ServerResponse<Array<Robot>> = await getRobotList();
   desserts.value = result.data;
 }
 
-function editItem(item: User) {
+function editItem(item: Robot) {
   editedItem.value = Object.assign({}, item)
   dialog.value = true
 }
 
-function deleteItem(item: User) {
+function deleteItem(item: Robot) {
   editedItem.value = Object.assign({}, item)
   dialogDelete.value = true
 }
 
 async function deleteItemConfirm() {
-  const result = await userDelete(editedItem.value.id);
+  const result = await robotDelete(editedItem.value.id);
   initialize();
   closeDelete()
 }
@@ -202,15 +166,14 @@ function closeDelete() {
 
 async function save() {
   if (editedItem.value.id == -1) {
-    const passwordSha256 = CryptoJS.SHA256(editedItem.value.name + "&" + editedItem.value.pwd).toString(CryptoJS.enc.Hex);
-    editedItem.value.pwd = passwordSha256;
-    const result = await userSave(editedItem.value);
-  } else {
-    const result = await userUpdate(editedItem.value);
+    editedItem.value.expirationAt.setFullYear(
+      editedItem.value.expirationAt.getFullYear() + 1
+    )
   }
+  const result = await robotSave(editedItem.value);
+
   initialize();
   close()
-  editedItem.value.pwd = '';
 }
 watch(dialog, val => {
   val || close()
@@ -220,22 +183,9 @@ watch(dialogDelete, val => {
   val || closeDelete()
 })
 
-function accessTypeText(value: number): string {
-  switch (value) {
-    case 1:
-      return '管理员'
-    case 2:
-      return '运维'
-    case 3:
-      return '访客'
-  }
-  return '未知'
-}
-
 onMounted(async () => {
   await nextTick();
   initialize();
-  roleItems.value = (await getRoles()).data;
 })
 
 </script>

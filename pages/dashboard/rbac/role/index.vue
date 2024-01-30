@@ -1,6 +1,6 @@
 <template>
   <v-card class="ma-2">
-    <v-data-iterator :items="roles" :items-per-page="6" :search="search">
+    <v-data-iterator :items="roles" :items-per-page="3" :search="search">
       <template v-slot:header>
         <v-toolbar class="px-2">
           <v-text-field v-model="search" clearable density="comfortable" hide-details placeholder="Search"
@@ -53,7 +53,7 @@
         <v-container class="pa-2" fluid>
           <v-row dense>
             <v-col v-for="item in items" :key="item.raw.id" cols="auto" md="4">
-              <v-card class="pb-3" border flat @click="editRoleClickEvent(item.raw)">
+              <v-card class="pb-3" :variant="item.raw.id === currentRoleId ? 'outlined' : 'elevated'">
 
                 <v-list-item class="mb-2" :subtitle="item.raw.intro">
                   <template v-slot:title>
@@ -66,8 +66,16 @@
                     <v-icon icon="mdi-code-block-tags" start></v-icon>
                     <div class="text-truncate">{{ item.raw.code }}</div>
                   </div>
-
+                  <div>
+                    <v-btn border flat size="small" class="text-none" text="角色编辑" @click="editRoleClickEvent(item.raw)">
+                    </v-btn>
+                    <v-btn border flat size="small" class="text-none" text="权限编辑"
+                      @click="getRolePermissions(item.raw.id)">
+                    </v-btn>
+                  </div>
                 </div>
+
+
               </v-card>
             </v-col>
           </v-row>
@@ -89,21 +97,53 @@
       </template>
     </v-data-iterator>
   </v-card>
+
+
+  <v-data-table :headers="headers" :items="desserts" :sort-by="[{ key: 'id', order: 'asc' }]" v-model="rolePermission"
+    item-value="id" show-select :search="permissionSearch">
+    <template v-slot:top>
+      <v-toolbar flat>
+        <v-toolbar-title>角色权限管理</v-toolbar-title>
+        <v-text-field v-model="permissionSearch" clearable density="comfortable" hide-details placeholder="权限搜素"
+          prepend-inner-icon="mdi-magnify" style="max-width: 300px;" variant="solo"></v-text-field>
+
+        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" variant="outlined" @click="rolePermissionBtnSaveEvent">保存权限</v-btn>
+      </v-toolbar>
+    </template>
+  </v-data-table>
 </template>
 <style scoped></style>
 <script lang="ts" setup>
-import { getRoles, getRolePermissionByRoleId, saveRole, deleteRole } from '~/server/api/role';
+import { getRoles, getRolePermissionByRoleId, saveRole, deleteRole, rolePermissionsSave } from '~/server/api/role';
 import { ref, nextTick } from 'vue';
-import { toast } from 'vue3-toastify';
+import { getPermissions } from '~/server/api/permission';
 
 const roles = ref<Array<Role>>(new Array<Role>());
 
-const rolePermission = ref(new Array<Permission>())
+const rolePermission = ref<Array<Number>>(new Array<Number>());
+
+const desserts = ref(new Array<Permission>());
 
 const dialog = ref(false);
-const dialogDelete = ref(false);
 
 const search = ref('');
+
+const permissionSearch = ref('');
+
+const currentRoleId = ref(-1);
+
+const headers = ref<any>([
+  {
+    title: 'ID',
+    align: 'start',
+    key: 'id'
+  },
+  { title: '权限名称', key: 'name' },
+  { title: '接口地址', key: 'alias' },
+  { title: '请求类型', key: 'action' }
+])
 
 const editedItem = ref<Role>({
   id: -1,
@@ -135,9 +175,13 @@ const getRoleList = async () => {
 
 const getRolePermissions = async (id: number) => {
   await nextTick();
-  console.log(id);
   const result: ServerResponse<Role> = await getRolePermissionByRoleId(id);
-  rolePermission.value = result.data.permissions || [];
+  const filterList = new Array<Number>();
+  result.data.permissions?.forEach(function (value: Permission) {
+    filterList.push(value.id);
+  });
+  currentRoleId.value = id;
+  rolePermission.value = filterList;
 }
 
 function close() {
@@ -150,7 +194,6 @@ function close() {
 
 async function save() {
   const result: ServerResponse<Object> = await saveRole(editedItem.value);
-  toast.info(result.message);
   getRoleList();
   close()
 }
@@ -159,9 +202,18 @@ watch(dialog, val => {
   val || close()
 })
 
-onMounted(() => {
-  getRoleList();
+onMounted(async () => {
+  await nextTick();
+  await getRoleList();
+  await loadAllPermissions();
 });
+
+async function loadAllPermissions() {
+  nextTick();
+  desserts.value = (await getPermissions()).data;
+
+
+}
 
 function editRoleClickEvent(item: Role) {
   editedItem.value = item;
@@ -172,9 +224,17 @@ async function deleteRoleBtnEvent(id: number) {
   if (id === -1) return;
   await nextTick();
   const result = await deleteRole(id);
-  toast.info(result.message || '');
   getRoleList();
   close();
 }
+
+async function rolePermissionBtnSaveEvent() {
+  const result = await rolePermissionsSave({
+    roleId: currentRoleId.value,
+    permissions: rolePermission.value
+  });
+  getRolePermissionByRoleId(currentRoleId.value);
+}
+
 
 </script>

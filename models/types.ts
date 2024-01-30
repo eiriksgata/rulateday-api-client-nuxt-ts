@@ -4,64 +4,6 @@ type ServerResponse<T> = {
   data: T;
 };
 
-type Card = {
-  id: number;
-  type: number;
-  rarity: number;
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-  cardNo: string;
-  cardCode: string;
-  name: string;
-  describe: string;
-  title: string;
-  disabled?: boolean;
-  color?: string;
-};
-
-type NpcInfo = {
-  id: number;
-  createdAt: Date;
-  name: string;
-  describe: string;
-  code: string;
-  updatedAt: Date;
-  position: string;
-};
-
-type Scheme = {
-  id: number;
-  createdAt: Date;
-  name: string;
-  describe: string;
-  characterId: number;
-  updatedAt: Date;
-  code: string;
-  author: string;
-  priority: number;
-};
-
-type SchemeNode = {
-  id: number;
-  createdAt: Date;
-  updatedAt: Date;
-  name: string;
-  cardId: number;
-  schemeId: number;
-  describe: string;
-  first: number;
-  parentId: number;
-  cardPosition: number;
-  children?: SchemeNode[];
-};
-
-type SchemeNodeTreeStruct = {
-  offensive: SchemeNode;
-  defensive: SchemeNode;
-};
-
 type Role = {
   id?: number;
   name: string;
@@ -71,10 +13,49 @@ type Role = {
 };
 
 type Permission = {
-  id :number
-  parentId: number
-  name : string
-  alias : string
-  action : string
-  children : any
-}
+  id: number;
+  parentId?: number;
+  name: string;
+  alias: string;
+  action: string;
+  children?: Array<Permission>;
+};
+
+type User = {
+  id: number;
+  name: string;
+  password?: string;
+  pwd?: string;
+  type: 1 | 2 | 3;
+  isExpired: boolean;
+  isLocked: boolean;
+  isPasswdExpired: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  roles?: Array<Number>;
+};
+
+type RolePermissionsVo = {
+  roleId: number;
+  permissions: Array<Number>;
+};
+
+type TokenPayload = {
+  exp: number;
+  iat: number;
+  iss: string;
+  sub: string;
+  roles: Array<string>;
+};
+
+type Robot = {
+  id: number;
+  name: string;
+  createdAt: Date;
+  description: string;
+  machineCode: string;
+  updatedAt: Date;
+  expirationAt: Date;
+};
+
+

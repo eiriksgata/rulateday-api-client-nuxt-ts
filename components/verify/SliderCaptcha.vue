@@ -78,6 +78,7 @@ const sliderLoading = ref(false);
 const sliderCaptchaReadonly = ref(false);
 
 const getCaptcha = () => {
+  sliderX.value = 0;
   sliderLoading.value = true;
   sliderCaptchaReadonly.value = true;
   if (props.username == null || props.username == '') {

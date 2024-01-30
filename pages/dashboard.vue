@@ -1,7 +1,7 @@
 <template>
   <v-layout>
-    <v-navigation-drawer v-model="dashboardDrawer" :rail="rail" permanent @click="rail = false">
-      <v-list-item title="管理员后台" nav>
+    <v-navigation-drawer v-model="dashboardDrawer" :rail="rail" @click="rail = false">
+      <v-list-item title="Control Backend" nav>
         <template v-slot:append>
           <v-btn variant="text" :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'"
             @click.stop="rail = !rail"></v-btn>
@@ -10,17 +10,30 @@
 
       <v-divider></v-divider>
       <v-list density="compact" nav>
-        <v-list-item prepend-icon="mdi-home" title="Home" value="home"></v-list-item>
-        <v-list-group value="RBAC">
+        <v-list-item prepend-icon="mdi-monitor-dashboard" title="Home" value="home"></v-list-item>
+        <v-list-group value="RBAC" v-show="accountInfo.sub === 'admin'">
           <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" prepend-icon="mdi-account-circle" title="RBAC">
+            <v-list-item v-bind="props" prepend-icon="mdi-microsoft-access" title="RBAC">
             </v-list-item>
           </template>
           <v-list-item title="Role" value="role" @click="$router.push('/dashboard/rbac/role')"></v-list-item>
-          <v-list-item title="Permission" value="permission"></v-list-item>
-          <v-list-item title="User" value="user"></v-list-item>
-
+          <v-list-item title="Permission" value="permission"
+            @click="$router.push('/dashboard/rbac/permission')"></v-list-item>
+          <v-list-item title="User" value="user" @click="$router.push('/dashboard/rbac/user')"></v-list-item>
         </v-list-group>
+
+        <v-list-group value="Personnel">
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" prepend-icon="mdi-account-box-outline" title="账号管理">
+            </v-list-item>
+          </template>
+          <v-list-item title="凭证管理" value="passwordReset"
+            @click="$router.push('/dashboard/personnel/account')"></v-list-item>
+        </v-list-group>
+
+        <v-list-item prepend-icon="mdi-robot" title="机器人" value="home" @click="$router.push('/dashboard/robot')"></v-list-item>
+        
+
       </v-list>
     </v-navigation-drawer>
 
@@ -42,15 +55,9 @@
     </v-navigation-drawer> -->
 
     <v-app-bar prominent elevation="1">
-      <v-btn prepend-icon="mdi-home" style="margin-left: 50px;" @click="$router.push('/')">
-        <template v-slot:prepend>
-          <v-icon color=""></v-icon>
-        </template>
-        工具主页
-      </v-btn>
       <v-spacer></v-spacer>
       <v-btn class="mr-2" v-if="adminBtn" variant="outlined" color="waring"
-        @click="$router.push('/dashboard/home')">管理员后台</v-btn>
+        @click="$router.push('/dashboard/home')">Backend</v-btn>
 
       <v-btn class="mr-2" v-if="accountInfo.sub === ''" variant="outlined" color="info">登陆</v-btn>
 
@@ -66,25 +73,18 @@
     </v-main>
 
   </v-layout>
-
 </template>
 
 <style scoped></style>
 
 <script lang="ts" setup>
 
+
 const rail = ref(false)
 const dashboardDrawer = ref(true);
 
 const navigationOpen = ref('home');
 
-type TokenPayload = {
-  exp: number
-  iat: number
-  iss: string
-  sub: string
-  roles: Array<string>
-}
 
 const accountInfo = ref({
   exp: -1,

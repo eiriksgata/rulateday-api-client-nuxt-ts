@@ -50,7 +50,8 @@
 
 <style scoped>
 .login {
-  background-image: url('/images/material.jpg');
+  /* background-image: url('/images/material.jpg'); */
+  background-color: darkseagreen;
   height: 100vh;
 }
 </style>
@@ -120,12 +121,9 @@ const validate = () => {
 
     const passwordSha256 = CryptoJS.SHA256(form.username + "&" + form.password).toString(CryptoJS.enc.Hex);
 
-    const salt = genSaltSync(10);
-    const bcHash = hashSync(passwordSha256, salt);
-
     const cryptoJson = {
       username: form.username,
-      password: bcHash,
+      password: passwordSha256,
       data: {
         offset: form.captcha
       },
@@ -133,7 +131,7 @@ const validate = () => {
     }
 
     const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(cryptoJson), cryptoKey, { iv: cryptoIv });
-    const option: UseFetchOptions<ServerResponse<AccessTokenVo>> = {
+    const option: UseFetchOptions<ServerResponse<AccessTokenVo | string>> = {
       method: "put",
       headers: {
         'Secret': ciphertext.toString()
@@ -143,17 +141,27 @@ const validate = () => {
 
     valid.value = false;
     useFetch('/server/api/v1/authentication/captcha/slider', option).then(({ data: response }) => {
+      switch (response.value?.code) {
+        case 0:
+          toast.success(response.value.message);
+          break;
+        case -1:
+          toast.error((response.value.data as string) || response.value.message);
+          break;
+        default:
+          toast.error(response.value!.message);
+      }
+
       if (response.value?.code == 0) {
-        toast.success(response.value!.message);
-        localStorage.setItem("token", response.value!.data.token);
+        localStorage.setItem("token", (response.value!.data as AccessTokenVo).token);
         setTimeout(function () {
           navigateTo({ path: '/dashboard' });
         }, 2000);
-
       } else {
-        toast.error(response.value!.message);
         loading.value = false;
         valid.value = true;
+        sliderCaptchaState.value = "0";
+        getSliderCaptcha();
       }
 
     }).catch((error) => {
