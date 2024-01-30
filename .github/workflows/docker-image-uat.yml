@@ -3,7 +3,7 @@ name: docker image build and push
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["control-platform"]
+    branches: ["master"]
     
 jobs:
   # Build job
