@@ -1,0 +1,45 @@
+name: docker image build and push
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["control-platform"]
+    
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          
+      - name: Setup yarn
+        uses: DerYeger/yarn-setup-action@v1.0.1
+        with:
+          # The version of Node.js that will be used
+          node-version: "20"
+          
+      - uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.TC_DOCKER_HUB_ADDRESS }} # 声明镜像源
+          username: ${{ secrets.TC_DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.TC_DOCKER_HUB_PASSWORD }}
+      - name: build 
+        run: yarn build
+        
+      - name: Build docker image
+        run: 
+          docker buildx build --file Dockerfile --tag control-platform-client-uat:latest . 
+      - name: create tencent docker hub tag
+        run: docker image tag control-platform-client-uat:latest ${{ secrets.TC_DOCKER_HUB_ADDRESS }}/rulateday/control-platform-client-uat:latest
+      
+      - name: tencent push image
+        run: docker push ${{ secrets.TC_DOCKER_HUB_ADDRESS }}/rulateday/control-platform-client-uat:latest
+        
+
+
+
