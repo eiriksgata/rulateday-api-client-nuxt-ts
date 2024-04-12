@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="12" md="4" sm="4">
+    <v-col  md="4" sm="4">
       <v-card class="ma-3">
         <v-card-title>凭证管理</v-card-title>
         <v-card-text>
@@ -21,20 +21,15 @@
       </v-card>
     </v-col>
 
-    <v-col cols="12" md="6" sm="6">
+    <v-col md="4" sm="4">
       <v-card class="ma-3">
         <v-card-title>账号凭证</v-card-title>
 
         <v-card-text>
           <v-sheet>
-            <v-container>
-              <v-row justify="space-around">
-                <v-date-picker locale="zh-cn" v-model="expireDate" title="凭证过期时间" elevation="16" show-adjacent-months
-                  color="primary"></v-date-picker>
-              </v-row>
-            </v-container>
+            <VuetifyTimePicker v-model="expireDate" label="过期时间" />
             <v-btn @click="createJwt" block class="mt-2" color="primary">生成JWT</v-btn>
-            <v-textarea v-model="jwtGenResult" label="JWT"></v-textarea>
+            <v-textarea :rows="8" v-model="jwtGenResult" label="JWT"></v-textarea>
           </v-sheet>
         </v-card-text>
 

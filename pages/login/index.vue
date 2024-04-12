@@ -136,7 +136,7 @@ const validate = () => {
       headers: {
         'Secret': ciphertext.toString()
       },
-      server: true
+      server: false
     }
 
     valid.value = false;

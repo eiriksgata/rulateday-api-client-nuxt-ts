@@ -59,3 +59,8 @@ type Robot = {
 };
 
 
+type EircbcToolTokenGenerateVo = {
+  license: string;
+  issuedAt: Date;
+  expireDate: Date;
+}

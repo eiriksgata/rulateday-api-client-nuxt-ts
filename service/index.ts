@@ -16,6 +16,7 @@ class HttpRequest {
         method: method,
         headers: {
           Authorization: localStorage.getItem("token") || "",
+          //Authorization: "Bearer " + useRequestHeaders(["Cookie"]).cookie!.substring(6),
         },
         server: false,
         ...options,

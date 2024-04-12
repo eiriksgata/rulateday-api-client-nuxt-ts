@@ -70,11 +70,11 @@
     </template>
 
 
-    <template v-slot:no-data>
+    <!-- <template v-slot:no-data>
       <v-btn color="primary" @click="initialize">
         Reset
       </v-btn>
-    </template>
+    </template> -->
   </v-data-table>
 </template>
 
@@ -184,8 +184,8 @@ watch(dialogDelete, val => {
 })
 
 onMounted(async () => {
-  await nextTick();
   initialize();
 })
+
 
 </script>

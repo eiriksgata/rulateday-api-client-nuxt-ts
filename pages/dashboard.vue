@@ -10,7 +10,7 @@
 
       <v-divider></v-divider>
       <v-list density="compact" nav>
-        <v-list-item prepend-icon="mdi-monitor-dashboard" title="Home" value="home"></v-list-item>
+        <v-list-item prepend-icon="mdi-monitor-dashboard" title="Home" value="home" @click="$router.push('/dashboard/home')"></v-list-item>
         <v-list-group value="RBAC" v-show="accountInfo.sub === 'admin'">
           <template v-slot:activator="{ props }">
             <v-list-item v-bind="props" prepend-icon="mdi-microsoft-access" title="RBAC">
@@ -31,7 +31,9 @@
             @click="$router.push('/dashboard/personnel/account')"></v-list-item>
         </v-list-group>
 
-        <v-list-item prepend-icon="mdi-robot" title="机器人" value="home" @click="$router.push('/dashboard/robot')"></v-list-item>
+        <v-list-item prepend-icon="mdi-robot" title="机器人"  @click="$router.push('/dashboard/robot')"></v-list-item>
+        
+        <v-list-item prepend-icon="mdi-lock-check-outline" title="弹幕工具授权"  @click="$router.push('/dashboard/eirctool')"></v-list-item>
         
 
       </v-list>
