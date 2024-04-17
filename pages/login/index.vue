@@ -58,7 +58,6 @@
 
 <script setup lang="ts">
 import CryptoJS from 'crypto-js';
-import { genSaltSync, hashSync } from 'bcrypt-ts'
 import { toast } from 'vue3-toastify';
 import type { UseFetchOptions } from 'nuxt/app';
 

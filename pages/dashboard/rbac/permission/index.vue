@@ -77,7 +77,7 @@
 <style scoped></style>
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue'
-import { getPermissions, permissionSave, permissionDelete } from '~/server/api/permission';
+import { getPermissions, permissionSave, permissionDelete } from '~/server/routes/permission';
 
 const dialog = ref(false)
 const dialogDelete = ref(false)

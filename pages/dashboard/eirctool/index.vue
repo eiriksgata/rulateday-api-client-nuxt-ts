@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-import { tokenGenerate } from '~/server/api/eirctool';
+import { tokenGenerate } from '~/server/routes/eirctool';
 
 const genkeyForm = ref();
 const valid = ref(false);

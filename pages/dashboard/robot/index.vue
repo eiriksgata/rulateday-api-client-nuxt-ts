@@ -83,7 +83,7 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue'
 import Moment from 'moment';
-import { getRobotList, robotDelete, robotSave } from '~/server/api/robot';
+import { getRobotList, robotDelete, robotSave } from '~/server/routes/robot';
 
 const dialog = ref(false)
 const dialogDelete = ref(false)

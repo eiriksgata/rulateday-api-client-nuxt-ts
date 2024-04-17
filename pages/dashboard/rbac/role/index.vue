@@ -116,9 +116,9 @@
 </template>
 <style scoped></style>
 <script lang="ts" setup>
-import { getRoles, getRolePermissionByRoleId, saveRole, deleteRole, rolePermissionsSave } from '~/server/api/role';
+import { getRoles, getRolePermissionByRoleId, saveRole, deleteRole, rolePermissionsSave } from '~/server/routes/role';
 import { ref, nextTick } from 'vue';
-import { getPermissions } from '~/server/api/permission';
+import { getPermissions } from '~/server/routes/permission';
 
 const roles = ref<Array<Role>>(new Array<Role>());
 

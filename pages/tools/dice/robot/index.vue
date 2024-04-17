@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';;
-import { robotOpenRegister } from '~/server/api/robot';
+import { robotOpenRegister } from '~/server/routes/robot';
 
 
 const loading = ref(false);

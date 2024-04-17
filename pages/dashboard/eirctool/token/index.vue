@@ -80,7 +80,7 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue'
 import Moment from 'moment';
-import { getTokenList, deleteById, tokenSave } from '~/server/api/eirctool';
+import { deleteById, getTokenList, tokenSave } from '~/server/routes/eirctool';
 
 const dialog = ref(false)
 const dialogDelete = ref(false)

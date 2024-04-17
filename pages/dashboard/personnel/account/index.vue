@@ -42,7 +42,7 @@
 <style scoped></style>
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue'
-import { userPasswordReset, userJwtGen } from '~/server/api/user';
+import { userPasswordReset, userJwtGen } from '~/server/routes/user';
 import CryptoJS from 'crypto-js';
 
 const username = ref('');

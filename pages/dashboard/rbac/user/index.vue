@@ -109,9 +109,9 @@
 <style scoped></style>
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue'
-import { getUsers, userSave, userDelete, userUpdate } from '~/server/api/user';
+import { getUsers, userSave, userDelete, userUpdate } from '~/server/routes/user';
 import Moment from 'moment';
-import { getRoles } from '~/server/api/role';
+import { getRoles } from '~/server/routes/role';
 import CryptoJS from 'crypto-js';
 
 
