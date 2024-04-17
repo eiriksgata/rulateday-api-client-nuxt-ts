@@ -64,3 +64,13 @@ type EircbcToolTokenGenerateVo = {
   issuedAt: Date;
   expireDate: Date;
 }
+
+type EircbcToolToken = {
+  id: number;
+  code: string;
+  createdAt: Date;
+  updatedAt: Date;
+  issuedAt: Date;
+  expireDate: Date;
+  description: string;
+}

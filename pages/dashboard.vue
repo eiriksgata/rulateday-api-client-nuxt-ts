@@ -34,6 +34,7 @@
         <v-list-item prepend-icon="mdi-robot" title="机器人"  @click="$router.push('/dashboard/robot')"></v-list-item>
         
         <v-list-item prepend-icon="mdi-lock-check-outline" title="弹幕工具授权"  @click="$router.push('/dashboard/eirctool')"></v-list-item>
+        <v-list-item prepend-icon="mdi-lock-check-outline" title="工具在线授权"  @click="$router.push('/dashboard/eirctool/token')"></v-list-item>
         
 
       </v-list>
